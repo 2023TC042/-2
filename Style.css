@@ -32,21 +32,26 @@ body{display:flex;flex-direction:column;background:#f3f5f7;color:#111}
 .btn.primary{background:var(--accent);color:#fff}
 .btn.danger{background:var(--danger);color:#fff}
 
-main{flex:1;display:flex;align-items:stretch;justify-content:center;padding:8px}
+main{flex:1;
+  display:flex;
+  align-items:stretch;
+  justify-content:stretch; 
+  padding:0; 
+    }
 
 .timetable{
-  width:100%;
-  height:100%;
-  max-width:1200px;
+width:100%;
+  height: calc(100vh - var(--header-height));
+  max-width:none;
+  max-height: none;
   display:grid;
-  grid-template-columns: var(--side-label-width) repeat(5,1fr); /* 6列: 月〜土 */
-  grid-template-rows: 40px repeat(6, 1fr); /* 6時限 */
+  grid-template-columns: var(--side-label-width) repeat(5,1fr); 
+  grid-template-rows: 40px repeat(6, 1fr);
   gap: var(--gap);
   background:var(--grid-line);
-  border-radius:8px;
+  border-radius:0;
   overflow:auto;
-  max-height: calc(100vh - var(--header-height) - 16px);
-  padding:4px;
+  padding:0;
 }
 
 
