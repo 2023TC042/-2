@@ -332,6 +332,9 @@ toggleBtn.addEventListener('click', ()=>{
 loadData();
 buildGrid();
 setEditing(false);
+const mq = window.matchMedia('(max-width: 760px), (orientation: portrait)');
+mq.addEventListener('change', () => buildGrid());
+window.addEventListener('resize', () => buildGrid());
 
 document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape'){
