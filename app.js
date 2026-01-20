@@ -67,110 +67,70 @@ function loadData(){
 function saveData(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
-// --- 追加: 縦向き判定ヘルパー ---
 function isVerticalLayout(){
-  // CSS のメディアクエリと同じ条件にしています
   return window.matchMedia('(max-width: 760px), (orientation: portrait)').matches;
 }
 
 function buildGrid(){
+  // clear
   timetableEl.innerHTML = '';
 
-  const vertical = isVerticalLayout();
+  // grid: first row: corner + weekdays
+  const corner = document.createElement('div');
+  corner.className = 'header-cell corner';
+  corner.textContent = '時限／曜日';
+  timetableEl.appendChild(corner);
 
-  if(!vertical){
-    const corner = document.createElement('div');
-    corner.className = 'header-cell corner';
-    corner.textContent = '時限／曜日';
-    timetableEl.appendChild(corner);
+  WEEKDAYS.forEach(d=>{
+    const h = document.createElement('div');
+    h.className = 'header-cell';
+    h.textContent = d;
+    timetableEl.appendChild(h);
+  });
+
+  // rows: for each period, left label + cells
+  for(let p=1;p<=PERIODS;p++){
+    const label = document.createElement('div');
+    label.className = 'period-cell';
+    label.textContent = `${p}限`;
+    timetableEl.appendChild(label);
 
     WEEKDAYS.forEach(d=>{
-      const h = document.createElement('div');
-      h.className = 'header-cell';
-      h.textContent = d;
-      timetableEl.appendChild(h);
-    });
-    for(let p=1;p<=PERIODS;p++){
-      const label = document.createElement('div');
-      label.className = 'period-cell';
-      label.textContent = `${p}限`;
-      timetableEl.appendChild(label);
+      const key = `${d}-${p}`;
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      slot.dataset.key = key;
+      // add day/period attributes for responsive CSS
+      slot.dataset.day = d;
+      slot.dataset.period = p;
 
-      WEEKDAYS.forEach(d=>{
-        const key = `${d}-${p}`;
-        const slot = document.createElement('div');
-        slot.className = 'slot';
-        slot.dataset.key = key;
-        slot.dataset.day = d;
-        slot.dataset.period = p;
+      const item = data[key];
+      if(item && (item.subject || item.room || item.time)){
+        const subj = document.createElement('div');
+        subj.className = 'subject';
+        subj.textContent = item.subject || '';
+        slot.appendChild(subj);
 
-        const item = data[key];
-        if(item && (item.subject || item.room || item.time)){
-          const subj = document.createElement('div');
-          subj.className = 'subject';
-          subj.textContent = item.subject || '';
-          slot.appendChild(subj);
-
-          const meta = document.createElement('div');
-          meta.className = 'meta';
-          meta.textContent = `${item.room || ''}${item.room && item.time ? ' · ' : ''}${item.time || ''}`;
-          slot.appendChild(meta);
-        }else{
-          const placeholder = document.createElement('div');
-          placeholder.style.color = '#bbb';
-          placeholder.textContent = '（空）';
-          slot.appendChild(placeholder);
-        }
-
-        slot.addEventListener('click', (e)=>{
-          if(editing){
-            openEditor(key);
-          }else{
-            openViewer(key);
-          }
-        });
-
-        timetableEl.appendChild(slot);
-      });
-    }
-
-  }else{
-    WEEKDAYS.forEach(d=>{
-      for(let p=1;p<=PERIODS;p++){
-        const key = `${d}-${p}`;
-        const slot = document.createElement('div');
-        slot.className = 'slot';
-        slot.dataset.key = key;
-        slot.dataset.day = d;
-        slot.dataset.period = p;
-
-        const item = data[key];
-        if(item && (item.subject || item.room || item.time)){
-          const subj = document.createElement('div');
-          subj.className = 'subject';
-          subj.textContent = item.subject || '';
-          slot.appendChild(subj;
-          const meta = document.createElement('div');
-          meta.className = 'meta';
-          meta.textContent = `${item.room || ''}${item.room && item.time ? ' · ' : ''}${item.time || ''}`;
-          slot.appendChild(meta);
-        }else{
-          const placeholder = document.createElement('div');
-          placeholder.style.color = '#bbb';
-          placeholder.textContent = '（空）';
-          slot.appendChild(placeholder);
-        }
-
-        slot.addEventListener('click', (e)=>{
-          if(editing){
-            openEditor(key);
-          }else{
-            openViewer(key);
-          }
-        });
-
-        timetableEl.appendChild(slot);
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = `${item.room || ''}${item.room && item.time ? ' · ' : ''}${item.time || ''}`;
+        slot.appendChild(meta);
+      }else{
+        const placeholder = document.createElement('div');
+        placeholder.style.color = '#bbb';
+        placeholder.textContent = '（空）';
+        slot.appendChild(placeholder);
       }
+
+      slot.addEventListener('click', (e)=>{
+        if(editing){
+          openEditor(key);
+        }else{
+          openViewer(key);
+        }
+      });
+
+      timetableEl.appendChild(slot);
     });
   }
 
