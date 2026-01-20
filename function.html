@@ -28,7 +28,14 @@
           <label>教室<input id="room" type="text" /></label>
         </div>
         <div class="form-row">
-          <label>講義時間<input id="time" type="text" placeholder="例: 09:00-09:50" /></label>
+           <label>講義開始
+            <select id="time-start-hour" aria-label="開始時"></select>時
+            <select id="time-start-min" aria-label="開始分"></select>分
+          </label>
+          <label style="margin-left:8px">講義終了
+            <select id="time-end-hour" aria-label="終了時"></select>時
+            <select id="time-end-min" aria-label="終了分"></select>分
+          </label>
         </div>
         <div class="modal-actions">
           <button type="button" id="delete-btn" class="btn danger">削除</button>
