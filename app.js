@@ -10,7 +10,10 @@ const backdropEdit = document.getElementById('modal-edit-backdrop');
 const form = document.getElementById('edit-form');
 const subjectInput = document.getElementById('subject');
 const roomInput = document.getElementById('room');
-const timeInput = document.getElementById('time');
+const timeStartHour = document.getElementById('time-start-hour');
+const timeStartMin = document.getElementById('time-start-min');
+const timeEndHour = document.getElementById('time-end-hour');
+const timeEndMin = document.getElementById('time-end-min');
 const deleteBtn = document.getElementById('delete-btn');
 const cancelBtn = document.getElementById('cancel-btn');
 
@@ -27,6 +30,31 @@ let editing = false;
 let data = {}; // { "月-1": {subject, room, time, reports: [bool x15]}, ... }
 let activeKey = null;
 const REPORT_COUNT = 15;
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+function populateTimeSelects(){
+  if(timeStartHour.options.length > 0) return;
+  const emptyOpt = (t)=>{ const o = document.createElement('option'); o.value = ''; o.textContent = t; return o; };
+  timeStartHour.appendChild(emptyOpt('')); timeEndHour.appendChild(emptyOpt(''));
+  for(let h=1;h<=12;h++){
+    const o1 = document.createElement('option'); o1.value = String(h); o1.textContent = String(h);
+    const o2 = o1.cloneNode(true);
+    timeStartHour.appendChild(o1);
+    timeEndHour.appendChild(o2);
+  }
+  timeStartMin.appendChild(document.createElement('option')).value = '';
+  timeEndMin.appendChild(document.createElement('option')).value = '';
+  timeStartMin.options[0].textContent = '';
+  timeEndMin.options[0].textContent = '';
+  for(let m=0;m<60;m++){
+    const txt = pad2(m);
+    const o1 = document.createElement('option'); o1.value = txt; o1.textContent = txt;
+    const o2 = o1.cloneNode(true);
+    timeStartMin.appendChild(o1);
+    timeEndMin.appendChild(o2);
+  }
+}
 
 function loadData(){
   try{
@@ -120,13 +148,36 @@ function updateEditingState(){
     timetableEl.querySelectorAll('.slot').forEach(s=>s.classList.remove('editable'));
   }
 }
+function parseTimeRange(str){
+  if(!str || typeof str !== 'string') return null;
+  const m = str.match(/^\s*(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})\s*$/);
+  if(!m) return null;
+  return {
+    sh: String(Number(m[1])), // remove leading zero if any -> stores values as 1..12 possibly
+    sm: pad2(Number(m[2])),
+    eh: String(Number(m[3])),
+    em: pad2(Number(m[4]))
+  };
+}
 
 function openEditor(key){
+  populateTimeSelects(); 
   activeKey = key;
   const item = data[key] || {};
   subjectInput.value = item.subject || '';
   roomInput.value = item.room || '';
-  timeInput.value = item.time || '';
+  const parsed = parseTimeRange(item.time);
+  if(parsed){
+    timeStartHour.value = parsed.sh;
+    timeStartMin.value = parsed.sm;
+    timeEndHour.value = parsed.eh;
+    timeEndMin.value = parsed.em;
+  }else{
+    timeStartHour.value = '';
+    timeStartMin.value = '';
+    timeEndHour.value = '';
+    timeEndMin.value = '';
+  }
   modalEdit.setAttribute('aria-hidden','false');
   modalEdit.style.display = 'flex';
   subjectInput.focus();
@@ -143,7 +194,18 @@ form.addEventListener('submit', (e)=>{
   if(!activeKey) return;
   const subject = subjectInput.value.trim();
   const room = roomInput.value.trim();
-  const time = timeInput.value.trim();
+   let time = '';
+  const sh = timeStartHour.value;
+  const sm = timeStartMin.value;
+  const eh = timeEndHour.value;
+  const em = timeEndMin.value;
+  if(sh || sm || eh || em){
+    const sHour = sh ? pad2(Number(sh)) : '01';
+    const sMin = sm ? pad2(Number(sm)) : '00';
+    const eHour = eh ? pad2(Number(eh)) : sHour;
+    const eMin = em ? pad2(Number(em)) : '00';
+    time = `${sHour}:${sMin}-${eHour}:${eMin}`;
+  }
   if(!subject && !room && !time){
 
     delete data[activeKey];
