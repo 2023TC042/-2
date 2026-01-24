@@ -67,9 +67,6 @@ function loadData(){
 function saveData(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
-function isVerticalLayout(){
-  return window.matchMedia('(max-width: 760px), (orientation: portrait)').matches;
-}
 
 function isVerticalLayout(){
   return window.matchMedia('(max-width: 760px), (orientation: portrait)').matches;
@@ -104,7 +101,6 @@ function buildGrid(){
       const slot = document.createElement('div');
       slot.className = 'slot';
       slot.dataset.key = key;
-      // add day/period attributes for responsive CSS
       slot.dataset.day = d;
       slot.dataset.period = p;
 
@@ -152,7 +148,7 @@ function buildGrid(){
           const subj = document.createElement('div');
           subj.className = 'subject';
           subj.textContent = item.subject || '';
-          slot.appendChild(subj;
+          slot.appendChild(subj);
 
           const meta = document.createElement('div');
           meta.className = 'meta';
