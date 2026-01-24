@@ -75,11 +75,13 @@ function buildGrid(){
   // clear
   timetableEl.innerHTML = '';
 
-  // grid: first row: corner + weekdays
-  const corner = document.createElement('div');
-  corner.className = 'header-cell corner';
-  corner.textContent = '時限／曜日';
-  timetableEl.appendChild(corner);
+  const vertical = isVerticalLayout();
+
+  if(!vertical){
+    const corner = document.createElement('div');
+    corner.className = 'header-cell corner';
+    corner.textContent = '時限／曜日';
+    timetableEl.appendChild(corner);
 
   WEEKDAYS.forEach(d=>{
     const h = document.createElement('div');
@@ -88,7 +90,6 @@ function buildGrid(){
     timetableEl.appendChild(h);
   });
 
-  // rows: for each period, left label + cells
   for(let p=1;p<=PERIODS;p++){
     const label = document.createElement('div');
     label.className = 'period-cell';
@@ -292,6 +293,9 @@ toggleBtn.addEventListener('click', ()=>{
 loadData();
 buildGrid();
 setEditing(false);
+const mq = window.matchMedia('(max-width: 760px), (orientation: portrait)');
+mq.addEventListener('change', () => buildGrid());
+window.addEventListener('resize', () => buildGrid());
 const mq = window.matchMedia('(max-width: 760px), (orientation: portrait)');
 mq.addEventListener('change', () => buildGrid());
 window.addEventListener('resize', () => buildGrid());
