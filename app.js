@@ -137,6 +137,46 @@ function buildGrid(){
       timetableEl.appendChild(slot);
     });
   }
+  }else{
+       WEEKDAYS.forEach(d=>{
+      for(let p=1;p<=PERIODS;p++){
+        const key = `${d}-${p}`;
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.dataset.key = key;
+        slot.dataset.day = d;
+        slot.dataset.period = p;
+
+        const item = data[key];
+        if(item && (item.subject || item.room || item.time)){
+          const subj = document.createElement('div');
+          subj.className = 'subject';
+          subj.textContent = item.subject || '';
+          slot.appendChild(subj;
+
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.textContent = `${item.room || ''}${item.room && item.time ? ' · ' : ''}${item.time || ''}`;
+          slot.appendChild(meta);
+        }else{
+          const placeholder = document.createElement('div');
+          placeholder.style.color = '#bbb';
+          placeholder.textContent = '（空）';
+          slot.appendChild(placeholder);
+        }
+
+        slot.addEventListener('click', (e)=>{
+          if(editing){
+            openEditor(key);
+          }else{
+            openViewer(key);
+          }
+        });
+
+        timetableEl.appendChild(slot);
+      }
+    });
+  }
 
   updateEditingState();
 }
@@ -296,6 +336,9 @@ toggleBtn.addEventListener('click', ()=>{
 loadData();
 buildGrid();
 setEditing(false);
+const mq = window.matchMedia('(max-width: 760px), (orientation: portrait)');
+mq.addEventListener('change', () => buildGrid());
+window.addEventListener('resize', () => buildGrid());
 
 document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape'){
