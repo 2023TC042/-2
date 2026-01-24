@@ -71,6 +71,9 @@ function isVerticalLayout(){
   return window.matchMedia('(max-width: 760px), (orientation: portrait)').matches;
 }
 
+function isVerticalLayout(){
+  return window.matchMedia('(max-width: 760px), (orientation: portrait)').matches;
+}
 function buildGrid(){
   // clear
   timetableEl.innerHTML = '';
